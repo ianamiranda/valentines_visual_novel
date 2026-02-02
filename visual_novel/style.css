@@ -1,6 +1,6 @@
 body {
-  background: #ffdde1;
-  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,24 +9,59 @@ body {
 
 #game {
   background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 400px;
+  padding: 25px;
+  width: 420px;
+  border-radius: 16px;
   text-align: center;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+#image img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+#story {
+  font-size: 16px;
+  margin-bottom: 15px;
+  white-space: pre-line;
 }
 
 button {
-  margin: 10px;
-  padding: 10px 20px;
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 10px;
   background: #ff6f91;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
+  cursor: pointer;
 }
 
 button:hover {
   background: #ff3e6c;
+}
+
+.fade {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#stats {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #666;
 }

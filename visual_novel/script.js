@@ -1,67 +1,182 @@
 const story = document.getElementById("story");
 const choicesDiv = document.getElementById("choices");
+const imageDiv = document.getElementById("image");
+const statsDiv = document.getElementById("stats");
 
-// Todas las escenas del juego
+let state;
+
+function resetState(worse = false) {
+  state = {
+    memes: 0,
+    money: worse ? 10 : 20,
+    dignity: worse ? 60 : 100,
+    worseRun: worse
+  };
+}
+
+resetState();
+
 const scenes = {
   start: {
-    text: "💘 Es 14 de febrero. Estás en casa viendo Netflix. ¿Qué haces?",
+    text: "Antes de empezar, un besito y unas flores para que no te sientas solito :) \n💘 Es 14 de febrero.\nNetflix sigue preguntando si sigues ahí.",
+    image: "img/alone.jpg",
     choices: [
-      { text: "Comprar chocolates 🍫", next: "chocolate" },
-      { text: "Mandar memes 💀", next: "memes" },
-      { text: "Jugar videojuegos 🎮", next: "games" }
+      { text: "Salir a la calle 🚶", next: "street" },
+      { text: "Mandar memes 📱", next: "memes" },
+      { text: "Ignorar el día 🎮", next: "games" }
     ]
   },
 
-  chocolate: {
-    text: "Vas a la tienda... los chocolates cuestan 3 veces más 😭",
+  street: {
+    text: "Sales a la calle.\nDemasiadas parejas. Demasiado contacto visual.",
+    image: "img/street.jpg",
     choices: [
-      { text: "Igual los compro", next: "broke" },
-      { text: "Mejor regreso a casa", next: "start" }
+      {
+        text: "Comprar chocolates (-10€)",
+        effect: () => state.money -= 10,
+        next: "chocolate"
+      },
+      { text: "Volver a casa", next: "start" }
     ]
   },
 
   memes: {
-    text: "Envías memes de San Valentín. Te bloquean 2 personas 💔",
+    text: "Empiezas a mandar memes.\nAlgunos funcionan. Otros… no.",
+    image: "img/meme.jpg",
     choices: [
-      { text: "Mandar MÁS memes", next: "blocked" },
-      { text: "Pedir perdón", next: "forgive" }
+      {
+        text: "Mandar otro meme",
+        effect: () => {
+          state.memes++;
+          state.dignity -= 10;
+        },
+        next: "memes"
+      },
+      {
+        text: "Parar y esperar respuesta",
+        next: "checkMemes"
+      }
+    ]
+  },
+
+  checkMemes: {
+    text: () => {
+      if (state.memes >= 4 && state.dignity <= 40) {
+        return "Nadie responde.\nHas cruzado una línea invisible.";
+      }
+      return "Alguien responde con un emoji.\nNo sabes cuál es el tono.";
+    },
+    image: "img/chat.jpg",
+    choices: [
+      { text: "Aceptar el destino", next: "endingCheck" }
+    ]
+  },
+
+  chocolate: {
+    text: "Compras chocolates caros.\nNo tienes un plan.",
+    image: "img/chocolate.jpg",
+    choices: [
+      { text: "Comértelos tú", next: "endingSelf" },
+      { text: "Regalarlos igual", next: "endingAwkward" }
     ]
   },
 
   games: {
-    text: "Te vicias jugando. Olvidas que es San Valentín. Final feliz 😎",
+    text: "Te pones a jugar.\nEl tiempo deja de existir.",
+    image: "img/gaming.jpg",
+    choices: [
+      { text: "Seguir jugando", next: "endingPeace" }
+    ]
+  },
+
+  endingCheck: {
+    text: () => {
+      if (state.memes >= 5) {
+        return "FINAL SECRETO:\nSilenciado en múltiples chats \nUna leyenda";
+      }
+      return "FINAL:\nSobreviviste socialmente.\nPor poco.";
+    },
+    image: () =>
+      state.memes >= 5 ? "img/end_secret.jpg" : "img/end_porpoco.jpg",
     choices: []
   },
 
-  broke: {
-    text: "Te quedas sin dinero pero con chocolates. Worth it.",
+  endingSelf: {
+    text: "FINAL:\nAmor propio.\nChocolate caro. Decisión correcta.",
+    image: "img/end_ok.jpg",
     choices: []
   },
 
-  blocked: {
-    text: "Ahora estás bloqueado, pero fiel a tu estilo 💀",
+  endingAwkward: {
+    text: "FINAL:\neeeeeeeee ok¿",
+    image: "img/end_awkward.jpg",
     choices: []
   },
 
-  forgive: {
-    text: "Te perdonan. Te mandan un corazón 🥹",
+  endingPeace: {
+    text: "FINAL:\nPaz mental.\nNadie te molestó.\nUn besito para ti",
+    image: "img/end_peace.jpg",
     choices: []
   }
 };
 
-// Función para mostrar escenas
-function showScene(sceneKey) {
-  const scene = scenes[sceneKey];
-  story.textContent = scene.text;
-  choicesDiv.innerHTML = "";
+function showScene(key) {
+  const scene = scenes[key];
 
+  const text =
+    typeof scene.text === "function" ? scene.text() : scene.text;
+  story.textContent = text;
+
+  imageDiv.innerHTML = "";
+  const imgSrc =
+    typeof scene.image === "function" ? scene.image() : scene.image;
+  if (imgSrc) {
+    const img = document.createElement("img");
+    img.src = imgSrc;
+    img.classList.add("fade");
+    imageDiv.appendChild(img);
+  }
+
+  choicesDiv.innerHTML = "";
   scene.choices.forEach(choice => {
-    const button = document.createElement("button");
-    button.textContent = choice.text;
-    button.onclick = () => showScene(choice.next);
-    choicesDiv.appendChild(button);
+    const btn = document.createElement("button");
+    btn.textContent = choice.text;
+    btn.onclick = () => {
+      if (choice.effect) choice.effect();
+      showScene(choice.next);
+    };
+    choicesDiv.appendChild(btn);
   });
+
+  updateStats();
+
+  if (scene.choices.length === 0) {
+    addEndButtons();
+  }
 }
 
-// Iniciar el juego
+function updateStats() {
+  statsDiv.textContent =
+    `💰 Dinero: ${state.money}€ | 📱 Memes: ${state.memes} | 🧠 Dignidad: ${state.dignity}`;
+}
+
+function addEndButtons() {
+  const retry = document.createElement("button");
+  retry.textContent = "Reintentar (pero peor)";
+  retry.onclick = () => {
+    resetState(true);
+    showScene("start");
+  };
+
+  const restart = document.createElement("button");
+  restart.textContent = "Reiniciar normal";
+  restart.onclick = () => {
+    resetState(false);
+    showScene("start");
+  };
+
+  choicesDiv.appendChild(retry);
+  choicesDiv.appendChild(restart);
+}
+
 showScene("start");
