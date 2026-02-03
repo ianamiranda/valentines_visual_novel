@@ -1,32 +1,102 @@
+const intro = document.getElementById("intro");
+const game = document.getElementById("game");
+const music = document.getElementById("music");
+
+const step1 = document.getElementById("intro-step-1");
+const step2 = document.getElementById("intro-step-2");
+
+const nameInput = document.getElementById("nameInput");
+const confirmName = document.getElementById("confirmName");
+const startGame = document.getElementById("startGame");
+
 const story = document.getElementById("story");
 const choicesDiv = document.getElementById("choices");
 const imageDiv = document.getElementById("image");
 const statsDiv = document.getElementById("stats");
-const intro = document.getElementById("intro");
-const game = document.getElementById("game");
-const VALENTINE_NAME = "Alex"; // o el nombre que quieras
 
 game.style.display = "none";
 
+let VALENTINE_NAME = "Criatura misteriosa";
 let state;
 
-const music = document.getElementById("music");
-
-function fakeVibration() {
-  document.body.classList.add("glitch");
-  setTimeout(() => document.body.classList.remove("glitch"), 300);
-}
+/* ================= FX ================= */
 
 function spawnHeart() {
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.textContent = Math.random() > 0.5 ? "💘" : "❤️";
-  heart.style.left = Math.random() * 100 + "vw";
-  heart.style.animationDuration = 3 + Math.random() * 3 + "s";
-  heart.style.fontSize = 14 + Math.random() * 30 + "px";
-  document.getElementById("hearts").appendChild(heart);
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.animationDuration = 4 + Math.random() * 4 + "s";
 
-  setTimeout(() => heart.remove(), 6000);
+  // 50% corazones grandes con foto, 50% corazones pequeños solo emoji
+  if (Math.random() > 0.5) {
+    // Corazón grande con foto y marco SVG de corazón
+    const size = 90 + Math.random() * 40;
+    h.style.width = size + "px";
+    h.style.height = size + "px";
+    h.style.position = "relative";
+    h.style.display = "flex";
+    h.style.justifyContent = "center";
+    h.style.alignItems = "center";
+
+    // SVG corazón como marco
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", size);
+    svg.setAttribute("height", size);
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.style.position = "absolute";
+    svg.style.left = 0;
+    svg.style.top = 0;
+    svg.style.zIndex = 2;
+
+    // Marco de corazón
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", "M50 85 L15 50 A25 25 0 1 1 50 25 A25 25 0 1 1 85 50 Z");
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#ff3e6c");
+    path.setAttribute("stroke-width", "4");
+    svg.appendChild(path);
+
+    // ClipPath para la imagen
+    const defs = document.createElementNS(svgNS, "defs");
+    const clipPath = document.createElementNS(svgNS, "clipPath");
+    const clipId = "heartClip" + Math.random().toString(36).substr(2, 9);
+    clipPath.setAttribute("id", clipId);
+    const clipPathShape = document.createElementNS(svgNS, "path");
+    clipPathShape.setAttribute("d", "M50 85 L15 50 A25 25 0 1 1 50 25 A25 25 0 1 1 85 50 Z");
+    clipPath.appendChild(clipPathShape);
+    defs.appendChild(clipPath);
+    svg.appendChild(defs);
+
+    // Imagen besito recortada en forma de corazón
+    const img = document.createElementNS(svgNS, "image");
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', "img/besito.jpg");
+    img.setAttribute("width", "100");
+    img.setAttribute("height", "100");
+    img.setAttribute("clip-path", `url(#${clipId})`);
+    img.setAttribute("preserveAspectRatio", "xMidYMid slice");
+    svg.appendChild(img);
+
+    h.appendChild(svg);
+  } else {
+    // Corazón pequeño solo emoji
+    const size = 32 + Math.random() * 18;
+    h.style.width = size + "px";
+    h.style.height = size + "px";
+    h.style.display = "flex";
+    h.style.justifyContent = "center";
+    h.style.alignItems = "center";
+    h.style.position = "relative";
+    const emoji = document.createElement("span");
+    emoji.textContent = Math.random() > 0.5 ? "💘" : "❤️";
+    emoji.style.fontSize = size + "px";
+    emoji.style.lineHeight = 1;
+    emoji.style.zIndex = 1;
+    h.appendChild(emoji);
+  }
+
+  document.getElementById("hearts").appendChild(h);
+  setTimeout(() => h.remove(), 8000);
 }
 
 function launchConfetti() {
@@ -34,30 +104,62 @@ function launchConfetti() {
     const c = document.createElement("div");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
-    c.style.top = "-10px";
     c.style.setProperty("--hue", Math.random() * 360);
-    c.style.animationDuration = 2 + Math.random() * 3 + "s";
+    c.style.animationDuration = 3 + Math.random() * 3 + "s";
     document.getElementById("confetti").appendChild(c);
-
-    setTimeout(() => c.remove(), 5000);
+    setTimeout(() => c.remove(), 7000);
   }
 }
 
+/* ============ INTRO FLOW ============ */
 
-function resetState(worse = false) {
+let heartInterval = null;
+
+function startIntroFX() {
+  if (!heartInterval) {
+    heartInterval = setInterval(spawnHeart, 500);
+    launchConfetti();
+  }
+}
+
+confirmName.addEventListener("click", () => {
+  VALENTINE_NAME = nameInput.value.trim() || "criatura misteriosa";
+
+  startIntroFX();
+
+  music.volume = 0.4;
+  music.play().catch(() => {});
+
+  step1.classList.add("hidden");
+  step2.classList.remove("hidden");
+});
+
+/* Enter también confirma nombre */
+nameInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") confirmName.click();
+});
+
+startGame.addEventListener("click", () => {
+  intro.style.display = "none";
+  game.style.display = "block";
+
+  resetState();
+  showScene("start");
+});
+
+/* ================= GAME ================= */
+
+function resetState() {
   state = {
     memes: 0,
-    money: worse ? 10 : 20,
-    dignity: worse ? 60 : 100,
-    worseRun: worse
+    money: 20,
+    dignity: 100
   };
 }
 
-resetState();
-
 const scenes = {
   start: {
-    text: "Antes de empezar, un besito y unas flores para que no te sientas solito :) \n💘 Es 14 de febrero.\nNetflix sigue preguntando si sigues ahí.",
+    text: `Netflix sigue preguntando si sigues ahí.`,
     image: "img/alone.jpg",
     choices: [
       { text: "Salir a la calle 🚶", next: "street" },
@@ -65,151 +167,37 @@ const scenes = {
       { text: "Ignorar el día 🎮", next: "games" }
     ]
   },
-
   street: {
-    text: "Sales a la calle.\nDemasiadas parejas. Demasiado contacto visual.",
+    text: "Demasiadas parejas. Demasiado contacto visual.",
     image: "img/street.jpg",
-    choices: [
-      {
-        text: "Comprar chocolates (-10€)",
-        effect: () => state.money -= 10,
-        next: "chocolate"
-      },
-      { text: "Volver a casa", next: "start" }
-    ]
+    choices: [{ text: "Volver a casa", next: "start" }]
   },
-
   memes: {
-    text: "Empiezas a mandar memes.\nAlgunos funcionan. Otros… no.",
+    text: "Mandas memes.\nAlgunos no debieron nacer.",
     image: "img/meme.jpg",
-    choices: [
-      {
-        text: "Mandar otro meme",
-        effect: () => {
-          state.memes++;
-          state.dignity -= 10;
-        },
-        next: "memes"
-      },
-      {
-        text: "Parar y esperar respuesta",
-        next: "checkMemes"
-      }
-    ]
+    choices: [{ text: "Aceptar el destino", next: "ending" }]
   },
-
-  checkMemes: {
-    text: () => {
-      if (state.memes >= 4 && state.dignity <= 40) {
-        return "Nadie responde.\nHas cruzado una línea invisible.";
-      }
-      return "Alguien responde con un emoji.\nNo sabes cuál es el tono.";
-    },
-    image: "img/chat.jpg",
-    choices: [
-      { text: "Aceptar el destino", next: "endingCheck" }
-    ]
-  },
-
-  chocolate: {
-    text: "Compras chocolates caros.\nNo tienes un plan.",
-    image: "img/chocolate.jpg",
-    choices: [
-      { text: "Comértelos tú", next: "endingSelf" },
-      { text: "Regalarlos igual", next: "endingAwkward" }
-    ]
-  },
-
   games: {
-    text: "Te pones a jugar.\nEl tiempo deja de existir.",
+    text: "Paz mental absoluta.",
     image: "img/gaming.jpg",
-    choices: [
-      { text: "Seguir jugando", next: "endingPeace" }
-    ]
+    choices: [{ text: "Final feliz", next: "ending" }]
   },
-
-  endingCheck: {
-    text: () => {
-      if (state.memes >= 5) {
-        return "FINAL SECRETO:\nSilenciado en múltiples chats \nUna leyenda";
-      }
-      return "FINAL:\nSobreviviste socialmente.\nPor poco.";
-    },
-    image: () =>
-      state.memes >= 5 ? "img/end_secret.jpg" : "img/end_porpoco.jpg",
-    choices: []
-  },
-
-  endingSelf: {
-    text: "FINAL:\nAmor propio.\nChocolate caro. Decisión correcta.",
+  ending: {
+    text: `FINAL:\n${VALENTINE_NAME}, sobreviviste a San Valentín.`,
     image: "img/end_ok.jpg",
-    choices: []
-  },
-
-  endingAwkward: {
-    text: "FINAL:\neeeeeeeee ok¿",
-    image: "img/end_awkward.jpg",
-    choices: []
-  },
-
-  endingPeace: {
-    text: "FINAL:\nPaz mental.\nNadie te molestó.\nUn besito para ti",
-    image: "img/end_peace.jpg",
     choices: []
   }
 };
 
-function showStartMessage() {
-  fakeVibration();
-
-  intro.innerHTML = `
-    <div class="intro-content glitch">
-      <h1>💘 FELIZ SAN VALENTÍN 💘</h1>
-      <p class="subtitle">
-        ${VALENTINE_NAME}, el algoritmo ha decidido que hoy sientas cosas
-      </p>
-      <p class="tap">cargando emociones artificiales...</p>
-    </div>
-  `;
-
-  launchConfetti();
-
-  setTimeout(() => {
-    intro.innerHTML = `
-      <div class="intro-content">
-        <h1>⚠️ AVISO ⚠️</h1>
-        <p class="subtitle">
-          Este juego puede contener:<br>
-          💔 cringe<br>
-          📱 memes malos<br>
-          🧠 decisiones cuestionables
-        </p>
-      </div>
-    `;
-  }, 2500);
-
-  setTimeout(() => {
-    intro.style.display = "none";
-    game.style.display = "block";
-    showScene("start");
-  }, 5000);
-}
-
-
 function showScene(key) {
   const scene = scenes[key];
 
-  const text =
-    typeof scene.text === "function" ? scene.text() : scene.text;
-  story.textContent = text;
-
+  story.textContent = scene.text;
   imageDiv.innerHTML = "";
-  const imgSrc =
-    typeof scene.image === "function" ? scene.image() : scene.image;
-  if (imgSrc) {
+
+  if (scene.image) {
     const img = document.createElement("img");
-    img.src = imgSrc;
-    img.classList.add("fade");
+    img.src = scene.image;
     imageDiv.appendChild(img);
   }
 
@@ -217,48 +205,10 @@ function showScene(key) {
   scene.choices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice.text;
-    btn.onclick = () => {
-      if (choice.effect) choice.effect();
-      showScene(choice.next);
-    };
+    btn.onclick = () => showScene(choice.next);
     choicesDiv.appendChild(btn);
   });
 
-  updateStats();
-
-  if (scene.choices.length === 0) {
-    addEndButtons();
-  }
-}
-
-function updateStats() {
   statsDiv.textContent =
-    `💰 Dinero: ${state.money}€ | 📱 Memes: ${state.memes} | 🧠 Dignidad: ${state.dignity}`;
+    `💰 ${state.money}€ | 📱 ${state.memes} memes | 🧠 ${state.dignity}`;
 }
-
-function addEndButtons() {
-  const retry = document.createElement("button");
-  retry.textContent = "Reintentar (pero peor)";
-  retry.onclick = () => {
-    resetState(true);
-    showScene("start");
-  };
-
-  const restart = document.createElement("button");
-  restart.textContent = "Reiniciar normal";
-  restart.onclick = () => {
-    resetState(false);
-    showScene("start");
-  };
-
-  choicesDiv.appendChild(retry);
-  choicesDiv.appendChild(restart);
-}
-
-intro.addEventListener("click", () => {
-  music.volume = 0.5;
-  music.play();
-  setInterval(spawnHeart, 300);
-  showStartMessage();
-});
-

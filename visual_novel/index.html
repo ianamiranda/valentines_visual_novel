@@ -7,29 +7,52 @@
 </head>
 <body>
 
-  <audio id="music" src="music/love.mp3" loop></audio>
+<audio id="music" src="music/love.mp3" loop></audio>
 
-  <div id="intro">
-    <div id="hearts"></div>
-    <div id="confetti"></div>
-    <div class="intro-content">
-      <h1>💘 Feliz San Valentín 💘</h1>
-      <p class="subtitle">Para alguien muy especial</p>
-      <p class="tap">Toca para continuar</p>
-    </div>
+<div id="intro">
+  <div id="hearts"></div>
+  <div id="confetti"></div>
+
+  <!-- PASO 1 -->
+  <div class="intro-content" id="intro-step-1">
+    <h1>💘 Feliz San Valentín 💘</h1>
+
+    <p class="subtitle">
+      El algoritmo ha decidido que hoy sientas cosas.
+    </p>
+
+    <input
+      id="nameInput"
+      type="text"
+      placeholder="Escribe tu nombre 👀"
+      maxlength="20"
+      autocomplete="off"
+    />
+
+    <button id="confirmName">Aceptar mi destino</button>
   </div>
 
+  <!-- PASO 2 -->
+  <div class="intro-content hidden" id="intro-step-2">
+    <h1>💘 Feliz San Valentín 💘</h1>
 
-  <div id="game">
-    <h1>💘 San Valentín Simulator</h1>
+    <p class="subtitle">
+      Antes de empezar, criatura misteriosa, toma un besito y unas flores 💐 
+      <br>¿Listo para decidir tu destino?
+    </p>
 
-    <div id="image"></div>
-    <p id="story"></p>
-
-    <div id="choices"></div>
-    <div id="stats"></div>
+    <button id="startGame">Continuar</button>
   </div>
+</div>
 
-  <script src="script.js"></script>
+<div id="game">
+  <h1>💘 San Valentín Simulator</h1>
+  <div id="image"></div>
+  <p id="story"></p>
+  <div id="choices"></div>
+  <div id="stats"></div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
