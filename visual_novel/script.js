@@ -2,8 +2,47 @@ const story = document.getElementById("story");
 const choicesDiv = document.getElementById("choices");
 const imageDiv = document.getElementById("image");
 const statsDiv = document.getElementById("stats");
+const intro = document.getElementById("intro");
+const game = document.getElementById("game");
+const VALENTINE_NAME = "Alex"; // o el nombre que quieras
+
+game.style.display = "none";
 
 let state;
+
+const music = document.getElementById("music");
+
+function fakeVibration() {
+  document.body.classList.add("glitch");
+  setTimeout(() => document.body.classList.remove("glitch"), 300);
+}
+
+function spawnHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = Math.random() > 0.5 ? "💘" : "❤️";
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.animationDuration = 3 + Math.random() * 3 + "s";
+  heart.style.fontSize = 14 + Math.random() * 30 + "px";
+  document.getElementById("hearts").appendChild(heart);
+
+  setTimeout(() => heart.remove(), 6000);
+}
+
+function launchConfetti() {
+  for (let i = 0; i < 120; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.top = "-10px";
+    c.style.setProperty("--hue", Math.random() * 360);
+    c.style.animationDuration = 2 + Math.random() * 3 + "s";
+    document.getElementById("confetti").appendChild(c);
+
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
 
 function resetState(worse = false) {
   state = {
@@ -120,6 +159,43 @@ const scenes = {
   }
 };
 
+function showStartMessage() {
+  fakeVibration();
+
+  intro.innerHTML = `
+    <div class="intro-content glitch">
+      <h1>💘 FELIZ SAN VALENTÍN 💘</h1>
+      <p class="subtitle">
+        ${VALENTINE_NAME}, el algoritmo ha decidido que hoy sientas cosas
+      </p>
+      <p class="tap">cargando emociones artificiales...</p>
+    </div>
+  `;
+
+  launchConfetti();
+
+  setTimeout(() => {
+    intro.innerHTML = `
+      <div class="intro-content">
+        <h1>⚠️ AVISO ⚠️</h1>
+        <p class="subtitle">
+          Este juego puede contener:<br>
+          💔 cringe<br>
+          📱 memes malos<br>
+          🧠 decisiones cuestionables
+        </p>
+      </div>
+    `;
+  }, 2500);
+
+  setTimeout(() => {
+    intro.style.display = "none";
+    game.style.display = "block";
+    showScene("start");
+  }, 5000);
+}
+
+
 function showScene(key) {
   const scene = scenes[key];
 
@@ -179,4 +255,10 @@ function addEndButtons() {
   choicesDiv.appendChild(restart);
 }
 
-showScene("start");
+intro.addEventListener("click", () => {
+  music.volume = 0.5;
+  music.play();
+  setInterval(spawnHeart, 300);
+  showStartMessage();
+});
+
