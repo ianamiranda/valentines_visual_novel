@@ -151,48 +151,136 @@ startGame.addEventListener("click", () => {
 
 function resetState() {
   state = {
-    memes: 0,
-    money: 20,
-    dignity: 100
+    chocolates: 0,
+    pistas: 0,
+    dinero: 10,
+    dignidad: 100,
+    sospecha: 0
   };
 }
 
 const scenes = {
   start: {
-    text: `Netflix sigue preguntando si sigues ahí.`,
+    text: `Hoy es San Valentín. Tu objetivo: ¡conseguir chocolates! Pero no será fácil... ¿Qué harás primero?`,
     image: "img/alone.jpg",
     choices: [
-      { text: "Salir a la calle 🚶", next: "street" },
-      { text: "Mandar memes 📱", next: "memes" },
-      { text: "Ignorar el día 🎮", next: "games" }
+      { text: "Buscar pistas en la calle 🕵️‍♂️", next: "street" },
+      { text: "Interrogar a tu mascota 🐶", next: "pet" },
+      { text: "Revisar la nevera 🍫", next: "fridge" }
     ]
   },
   street: {
-    text: "Demasiadas parejas. Demasiado contacto visual.",
+    text: "La calle está llena de parejas y sospechosos. Ves a alguien con una caja misteriosa... ¿Te acercas?",
     image: "img/street.jpg",
-    choices: [{ text: "Volver a casa", next: "start" }]
+    choices: [
+      { text: "Sí, acercarse", next: "stranger" },
+      { text: "No, mejor huir", next: "start" }
+    ]
   },
-  memes: {
-    text: "Mandas memes.\nAlgunos no debieron nacer.",
-    image: "img/meme.jpg",
-    choices: [{ text: "Aceptar el destino", next: "ending" }]
+  stranger: {
+    text: "El extraño te mira y te pregunta una adivinanza: '¿Qué es dulce y desaparece rápido en San Valentín?' Si aciertas, te dará la pista clave para abrir la caja del armario.",
+    image: "img/mistery.jpg",
+    choices: [
+      { text: "Responder: Chocolates", next: "pista1" },
+      { text: "Responder: Amor", next: "fail1" }
+    ]
   },
-  games: {
-    text: "Paz mental absoluta.",
-    image: "img/gaming.jpg",
-    choices: [{ text: "Final feliz", next: "ending" }]
+  pista1: {
+    text: "¡Correcto! Te da la pista clave: 'El código es el número de letras de la palabra CHOCO.'",
+    image: "img/clue.jpg",
+    choices: [
+      { text: "Volver a casa", next: "start", effect: () => { state.pistas = 1; } }
+    ]
   },
-  ending: {
-    text: `FINAL:\n${VALENTINE_NAME}, sobreviviste a San Valentín.`,
+  fail1: {
+    text: "El extraño se ríe y desaparece. Te quedas sin pista y no puedes abrir la caja...",
+    image: "img/fail.jpg",
+    choices: [
+      { text: "Volver a casa", next: "start" }
+    ]
+  },
+  pet: {
+    text: "Tu mascota te mira con cara de misterio. ¿Le das una galleta para que hable?",
+    image: "img/pet.jpg",
+    choices: [
+      { text: "Sí, darle galleta (-1€)", next: "petClue", effect: () => { state.dinero -= 1; } },
+      { text: "No, solo acariciar", next: "petNoClue" }
+    ]
+  },
+  petClue: {
+    text: "Tu mascota ladra y corre hacia el armario. ¿Será una pista?",
+    image: "img/clue.jpg",
+    choices: [
+      { text: "Abrir el armario", next: "armario" }]
+  },
+  petNoClue: {
+    text: "Tu mascota se duerme. No obtienes nada...",
+    image: "img/sleep.jpg",
+    choices: [
+      { text: "Volver a pensar", next: "start" }]
+  },
+  armario: {
+    text: "¡Encuentras una caja! Pero está cerrada con código. ¿Intentas abrirla?",
+    image: "img/box.jpg",
+    choices: [
+      { text: "Sí, intentar abrir", next: "code" },
+      { text: "No, buscar otra pista", next: "start" }]
+  },
+  code: {
+    text: function() {
+      if (state.pistas === 1) {
+        return "¿Qué código usas? (Recuerda la pista del extraño: número de letras de 'choco')";
+      } else {
+        return "La caja tiene un código, pero no tienes la pista necesaria...";
+      }
+    },
+    image: "img/code.jpg",
+    choices: function() {
+      if (state.pistas === 1) {
+        return [
+          { text: "5", next: "chocoBox" },
+          { text: "6", next: "fail2" }
+        ];
+      } else {
+        return [
+          { text: "Volver a buscar la pista", next: "start" }
+        ];
+      }
+    }
+  },
+  chocoBox: {
+    text: "¡La caja se abre y hay chocolates! Has conseguido tu primer chocolate.",
+    image: "img/choco.jpg",
+    choices: [
+      { text: "Celebrar 🎉", next: "celebrate" }]
+  },
+  fail2: {
+    text: "La caja no se abre. Quizá necesitas la pista correcta...",
+    image: "img/fail.jpg",
+    choices: [
+      { text: "Volver a buscar", next: "start" }]
+  },
+  fridge: {
+    text: "La nevera está vacía... salvo una nota: 'Busca en el armario'.",
+    image: "img/fridge.jpg",
+    choices: [
+      { text: "Ir al armario", next: "armario" },
+      { text: "Cerrar la nevera", next: "start" }]
+  },
+  celebrate: {
+    text: `¡FELICIDADES, ${VALENTINE_NAME}! Has conseguido chocolates y resuelto el misterio de San Valentín. ¿Quieres jugar otra vez?`,
     image: "img/end_ok.jpg",
-    choices: []
+    choices: [
+      { text: "Volver a empezar", next: "start", effect: () => { resetState(); } }]
   }
 };
 
 function showScene(key) {
   const scene = scenes[key];
 
-  story.textContent = scene.text;
+  // Permitir que text y choices sean funciones para escenas dinámicas
+  const sceneText = typeof scene.text === "function" ? scene.text() : scene.text;
+  story.textContent = sceneText;
   imageDiv.innerHTML = "";
 
   if (scene.image) {
@@ -202,13 +290,17 @@ function showScene(key) {
   }
 
   choicesDiv.innerHTML = "";
-  scene.choices.forEach(choice => {
+  const sceneChoices = typeof scene.choices === "function" ? scene.choices() : scene.choices;
+  sceneChoices.forEach(choice => {
     const btn = document.createElement("button");
     btn.textContent = choice.text;
-    btn.onclick = () => showScene(choice.next);
+    btn.onclick = () => {
+      if (choice.effect) choice.effect();
+      showScene(choice.next);
+    };
     choicesDiv.appendChild(btn);
   });
 
   statsDiv.textContent =
-    `💰 ${state.money}€ | 📱 ${state.memes} memes | 🧠 ${state.dignity}`;
+    `🕵️‍♂️ Pistas: ${state.pistas} | 💰 Dinero: ${state.dinero}€`;
 }

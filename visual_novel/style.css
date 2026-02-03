@@ -1,31 +1,56 @@
 body {
-  background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-  font-family: system-ui, sans-serif;
+  background: linear-gradient(120deg, #ffdde1 0%, #ee9ca7 100%);
+  font-family: 'Segoe UI', 'Montserrat', system-ui, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
 /* GAME */
 #game {
-  background: white;
-  padding: 25px;
-  width: 420px;
-  border-radius: 16px;
+  background: rgba(255,255,255,0.95);
+  padding: 32px 28px 24px 28px;
+  width: 430px;
+  border-radius: 22px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(255, 105, 135, 0.18), 0 2px 8px rgba(0,0,0,0.10);
+  position: relative;
+  border: 2px solid #ffb6c1;
+  animation: fadeIn 0.7s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 #image img {
   width: 100%;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(255, 105, 135, 0.13);
+  border: 2px solid #ffb6c1;
 }
 
 #story {
   white-space: pre-line;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+  font-size: 1.15rem;
+  color: #d72660;
+  font-weight: 500;
+  background: linear-gradient(90deg, #ffe1e8 60%, #fff6f6 100%);
+  border-radius: 10px;
+  padding: 12px 8px;
+  box-shadow: 0 2px 8px rgba(255, 105, 135, 0.07);
+}
+#choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  align-items: center;
 }
 
 /* INTRO */
@@ -58,16 +83,33 @@ body {
 }
 
 button {
-  padding: 12px;
+  padding: 13px 28px;
   border: none;
-  border-radius: 10px;
-  background: #ff6f91;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #ff6f91 60%, #ffb6c1 100%);
   color: white;
   cursor: pointer;
+  font-size: 1.08rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 105, 135, 0.10);
+  transition: background 0.2s, transform 0.2s;
+  outline: none;
 }
 
 button:hover {
-  background: #ff3e6c;
+  background: linear-gradient(90deg, #ff3e6c 60%, #ffb6c1 100%);
+  transform: scale(1.04);
+}
+#stats {
+  margin-top: 10px;
+  font-size: 1.08rem;
+  color: #d72660;
+  font-weight: 600;
+  background: #fff6f6;
+  border-radius: 8px;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(255, 105, 135, 0.07);
+  letter-spacing: 0.5px;
 }
 
 /* SHITPOST FX */
