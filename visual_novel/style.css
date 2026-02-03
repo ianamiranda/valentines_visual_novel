@@ -1,11 +1,13 @@
 body {
   background: linear-gradient(120deg, #ffdde1 0%, #ee9ca7 100%);
   font-family: 'Segoe UI', 'Montserrat', system-ui, sans-serif;
+  min-height: 100vh;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
+  padding-top: 40px;
+  box-sizing: border-box;
 }
 
 /* GAME */
@@ -19,6 +21,8 @@ body {
   position: relative;
   border: 2px solid #ffb6c1;
   animation: fadeIn 0.7s;
+  margin-top: 0;
+  margin-bottom: 40px;
 }
 
 @keyframes fadeIn {
