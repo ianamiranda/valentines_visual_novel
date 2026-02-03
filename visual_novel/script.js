@@ -180,7 +180,7 @@ const scenes = {
     ]
   },
   mapa: {
-    text: () => `¡Bien hecho, ${VALENTINE_NAME}! El mapa tiene marcas misteriosas y una X en el armario. ¿Sigues el mapa o buscas más pistas?`,
+    text: () => `¡Bien hecho! El mapa tiene marcas misteriosas y una X en el armario. ¿Sigues el mapa o buscas más pistas?`,
     image: "img/clue.jpg",
     choices: [
       { text: "Seguir el mapa", next: "armario" },
@@ -198,22 +198,29 @@ const scenes = {
     text: () => `Un extraño te detiene y te lanza dos preguntas. Si aciertas ambas, te dará la llave de la caja. Primera: 'Pequeñito, oscuro y siempre enfadado; si te descuidas, te deja marcado.'`,
     image: "img/mistery.jpg",
     choices: [
-      { text: "Responder: Trozo de carbón", next: "adivinanza2", effect: () => { state.adivinanza1 = true; } },
+      { text: "Responder: Trozo de carbón", next: "smart", effect: () => { state.adivinanza1 = true; } },
       { text: "Responder: Hormiga con mal humor", next: "fail1" },
       { text: "Responder: Cynthia", next: "fail2" }
     ]
   },
+  smart: {
+    text: () => `Ala que listo, yo hubiera dicho Cynthia. Aún así, has acertado... Ahora te preguntaré a cerca de tu preferencia entre varias imagenes. ¿Estás preparado, ${VALENTINE_NAME}?`,
+    image: "img/smart.jpg",
+    choices: [
+      { text: "Sí", next: "adivinanza2" }
+    ]
+  },
   adivinanza2: {
-    text: () => `¡Correcto, ${VALENTINE_NAME}! Segunda adivinanza: ¿Cuál de estas imágenes representa el verdadero tesoro de San Valentín?`,
+    text: () => `Elige una`,
     image: null,
     choices: [
       { text: "", next: "fail4", img: "img/jordi.jpg", alt: "Jordi" },
-      { text: "", next: "fail5", img: "img/berserk.jpg", alt: "Berserk" }
+      { text: "", next: "fail5", img: "img/berserk.jpg", alt: "Berserk" },
       { text: "", next: "llave", effect: () => { state.adivinanza2 = true; }, img: "img/estudiante.jpg", alt: "Estudiante" }
     ]
   },
   llave: {
-    text: () => `¡Genial, ${VALENTINE_NAME}! El extraño te da una llave dorada y te susurra: 'La caja solo se abre con la llave y el código secreto.'`,
+    text: () => `¡Genial! Al extraño le has dado pena y te da una llave dorada. Se te acerca al oído y te susurra: 'La caja solo se abre con la llave y el código secreto.'`,
     image: "img/clue.jpg",
     choices: [
       { text: "Volver a casa", next: "start", effect: () => { state.llave = true; state.pistas = 1; } }
@@ -227,14 +234,14 @@ const scenes = {
     ]
   },
   fail2: {
-    text: () => `Te has quedado MUY cerca, pero no todo lo pequeño y enfadado es Cynthia. No obtienes la llave, ${VALENTINE_NAME}.`,
+    text: () => `Te has quedado MUY cerca, pero no todo lo pequeño y enfadado es Cynthia. No obtienes la llave.`,
     image: "img/fail.jpg",
     choices: [
       { text: "Volver a casa", next: "start" }
     ]
   },
   fail4: {
-    text: () => `Deja de acosar a mujeres. Castigado sin llave, ${VALENTINE_NAME}.`,
+    text: () => `Deja de acosar a mujeres. Castigado sin llave.`,
     image: "img/fail.jpg",
     choices: [
       { text: "Volver a casa", next: "start" }
@@ -248,7 +255,7 @@ const scenes = {
     ]
   },
   pet: {
-    text: () => `Tu mascota te mira con cara de misterio, ${VALENTINE_NAME}. ¿Le das una galleta para que te ayude?`,
+    text: () => `Tu mascota te mira con cara de misterio. ¿Le das una galleta para que te ayude?`,
     image: "img/pet.jpg",
     choices: [
       { text: "Sí, darle galleta (-1€)", next: "petClue", effect: () => { state.dinero -= 1; } },
@@ -256,19 +263,19 @@ const scenes = {
     ]
   },
   petClue: {
-    text: () => `Tu mascota ladra y corre hacia el armario. Parece que quiere que lo abras, ${VALENTINE_NAME}.`,
+    text: () => `Tu mascota ladra y corre hacia el armario. Parece que quiere que lo abras.`,
     image: "img/clue.jpg",
     choices: [
       { text: "Abrir el armario", next: "armario" }]
   },
   petNoClue: {
-    text: () => `Tu mascota se duerme. No obtienes nada, ${VALENTINE_NAME}...`,
+    text: () => `Tu mascota se duerme. No obtienes nada...`,
     image: "img/sleep.jpg",
     choices: [
       { text: "Volver a pensar", next: "start" }]
   },
   armario: {
-    text: () => `¡${VALENTINE_NAME}, encuentras la caja del tesoro! Pero está cerrada con llave y código. ¿Intentas abrirla?`,
+    text: () => `¡Encuentras la caja del tesoro! Pero está cerrada con llave y código. ¿Intentas abrirla?`,
     image: "img/box.jpg",
     choices: [
       { text: "Sí, intentar abrir", next: "code" },
@@ -277,13 +284,13 @@ const scenes = {
   code: {
     text: function() {
       if (state.llave && state.pistas === 1) {
-        return `Tienes la llave dorada y la pista del código, ${VALENTINE_NAME}. El código indica lo más importante de San Valentín. ¿Cuál es?`;
+        return `Tienes la llave dorada y la pista del código. El código indica lo más importante de San Valentín. ¿Cuál es?`;
       } else if (!state.llave && state.pistas === 1) {
-        return `Tienes la pista del código pero te falta la llave, ${VALENTINE_NAME}.`;
+        return `Tienes la pista del código pero te falta la llave.`;
       } else if (state.llave && state.pistas !== 1) {
-        return `Tienes la llave pero te falta la pista del código, ${VALENTINE_NAME}.`;
+        return `Tienes la llave pero te falta la pista del código.`;
       } else {
-        return `La caja tiene un código y una cerradura, pero te faltan cosas, ${VALENTINE_NAME}...`;
+        return `La caja tiene un código y una cerradura, pero te faltan cosas...`;
       }
     },
     image: "img/code.jpg",
@@ -301,19 +308,19 @@ const scenes = {
     }
   },
   chocoBox: {
-    text: () => `¡La caja se abre y hay chocolates! ${VALENTINE_NAME}, has conseguido el tesoro de San Valentín tras superar todas las pruebas.`,
+    text: () => `¡La caja se abre y hay chocolates! Has conseguido el tesoro de San Valentín tras superar todas las pruebas.`,
     image: "img/choco.jpg",
     choices: [
       { text: "Celebrar 🎉", next: "celebrate" }]
   },
   fail3: {
-    text: () => `No sé si eres demasiado mayor o simplemente ingenuo. No has abierto la caja, ${VALENTINE_NAME}.`,
+    text: () => `No sé si eres demasiado mayor o simplemente ingenuo. No has abierto la caja.`,
     image: "img/fail.jpg",
     choices: [
       { text: "Volver a buscar", next: "start" }]
   },
   fridge: {
-    text: () => `La nevera está vacía... salvo una nota que dice: 'El tesoro está donde menos lo esperas, ${VALENTINE_NAME}'.`,
+    text: () => `La nevera está vacía... salvo una nota que dice: 'El tesoro está donde menos lo esperas'.`,
     image: "img/fridge.jpg",
     choices: [
       { text: "Ir al armario", next: "armario" },
